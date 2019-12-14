@@ -5,7 +5,7 @@ check-virtual-env:
 
 .PHONY: init
 init: check-virtual-env
-	pip install -U pip
+	pip install -U pip setuptools
 	pip install -r requirements.txt
 	cd ephem && ./download-ephem.sh
 
