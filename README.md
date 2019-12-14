@@ -49,4 +49,8 @@ State of the Planets
 }
 ```
 
+# Helpful links
+* <https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/MATLAB/index.html>
+* <https://spiceypy.readthedocs.io/>
+* <https://github.com/opentracing-contrib/python-flask/blob/master/Makefile>
 
