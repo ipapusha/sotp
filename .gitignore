@@ -1,0 +1,6 @@
+# Python byproducts
+__pycache__/
+venv/
+
+# IDE
+.vscode/
