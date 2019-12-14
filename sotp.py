@@ -26,7 +26,6 @@ def current_et():
     # outputs: 2019-12-14T00:35:35.119520+00:00
     now = datetime.datetime.now(datetime.timezone.utc)
     utc_time = now.isoformat()
-    assert str(now.tzinfo) == 'UTC'
     assert utc_time.endswith('+00:00')
     assert utc_time.find('T') > 0
 
