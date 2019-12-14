@@ -2,3 +2,6 @@ spiceypy
 flask
 yapf
 flake8
+jupyter
+matplotlib
+numpy

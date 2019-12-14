@@ -13,3 +13,7 @@ init: check-virtual-env
 run: check-virtual-env
 run: sotp.py
 	FLASK_APP=$< FLASK_DEBUG=1 flask run
+
+.PHONY: notebook
+notebook: check-virtual-env
+	jupyter notebook .
