@@ -1,8 +1,9 @@
+import flask
+from flask import jsonify
+import numpy as np
 import spiceypy as spice
 from spiceypy.utils.support_types import SpiceyError
 
-import flask
-from flask import jsonify
 
 import datetime
 
@@ -55,6 +56,8 @@ def target_state(naif_id, et=None):
     abcorr = 'NONE'
     obs = 'SOLAR SYSTEM BARYCENTER'
     state, lt = spice.spkezr(targ, et, ref, abcorr, obs)
+    dist = np.linalg.norm(state[0:3])
+    speed = np.linalg.norm(state[3:6])
     state = list(state)
 
     # information about the body geometry
@@ -73,6 +76,8 @@ def target_state(naif_id, et=None):
         'abcorr': abcorr,
         'obs': obs,
         'state': state,
+        'dist': dist,
+        'speed': speed,
         'lt': lt,
         'radii': radii
     }
