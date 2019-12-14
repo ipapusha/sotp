@@ -5,6 +5,7 @@ venv/
 # NAIF ephemerides
 *.bsp
 *.tls
+*.tpc
 
 # IDE
 .vscode/

@@ -1,4 +1,6 @@
 import spiceypy as spice
+from spiceypy.utils.support_types import SpiceyError
+
 import flask
 from flask import jsonify
 
@@ -10,7 +12,9 @@ app = flask.Flask(__name__)
 # load ephemerides
 spk_file = 'ephem/de430.bsp'
 lsk_file = 'ephem/naif0012.tls'
+pck_files = ['ephem/pck00010.tpc', 'ephem/gm_de431.tpc']
 spice.furnsh([lsk_file, spk_file])
+spice.furnsh(pck_files)
 
 # determine available naif_ids
 naif_ids = list(spice.spkobj(spk_file))
@@ -40,6 +44,40 @@ def current_et():
     return et
 
 
+def target_state(naif_id, et=None):
+    """ returns planet state/information in a dictionary """
+    # current state
+    if et is None:
+        et = current_et()
+    spice_time = spice.timout(et, pictur)
+    targ = spice.bodc2n(naif_id)
+    ref = 'J2000'
+    abcorr = 'NONE'
+    obs = 'SOLAR SYSTEM BARYCENTER'
+    state, lt = spice.spkezr(targ, et, ref, abcorr, obs)
+    state = list(state)
+
+    # information about the body geometry
+    try:
+        _, radii = spice.bodvrd(targ, 'RADII', 3)
+        radii = list(radii)
+    except SpiceyError:
+        radii = None
+
+    return {
+        'naif_id': naif_id,
+        'targ': targ,
+        'et': et,
+        'time': spice_time,
+        'ref': ref,
+        'abcorr': abcorr,
+        'obs': obs,
+        'state': state,
+        'lt': lt,
+        'radii': radii
+    }
+
+
 @app.route('/')
 def get_root():
     return str(app.url_map) + '\n'
@@ -54,33 +92,16 @@ def get_planets():
     })
 
 
-@app.route('/state/<int:naif_id>', defaults={'et': 'now'})
+@app.route('/state/<int:naif_id>', defaults={'et': None})
 @app.route('/state/<int:naif_id>/<int:et>')
 @app.route('/state/<int:naif_id>/<float:et>')
 def get_state(naif_id, et):
     try:
-        if et == 'now':
-            et = current_et()
-        spice_time = spice.timout(et, pictur)
-        targ = spice.bodc2n(naif_id)
-        ref = 'J2000'
-        abcorr = 'NONE'
-        obs = 'SOLAR SYSTEM BARYCENTER'
-        state, lt = spice.spkezr(targ, et, ref, abcorr, obs)
+        state = target_state(naif_id, et=et)
     except spice.utils.support_types.SpiceyError as e:
         flask.abort(400, str(e))
 
-    return jsonify({
-        'naif_id': naif_id,
-        'targ': targ,
-        'et': et,
-        'time': spice_time,
-        'ref': ref,
-        'abcorr': abcorr,
-        'obs': obs,
-        'state': list(state),
-        'lt': lt
-    })
+    return jsonify(state)
 
 
 @app.route('/now')
