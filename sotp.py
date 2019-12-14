@@ -12,22 +12,16 @@ spk_file = 'ephem/de430.bsp'
 lsk_file = 'ephem/naif0012.tls'
 spice.furnsh([lsk_file, spk_file])
 
+# determine available naif_ids
+naif_ids = list(spice.spkobj(spk_file))
+naif_names = [spice.bodc2n(i) for i in naif_ids]
 
-@app.route('/')
-def sotp():
-    return 'Hello'
-
-
-@app.route('/planets')
-def get_planets(spk=spk_file):
-    ids = list(spice.spkobj(spk))
-    names = [spice.bodc2n(i) for i in ids]
-    return jsonify({'ids': ids, 'names': names, 'spk': spk})
+# default time picture
+pictur = 'YYYY-MM-DD HR:MN:SC.###### UTC ::RND ::UTC'
 
 
-@app.route('/now')
-def current_time():
-    """ returns the current time in UTC and J2000 systems """
+def current_et():
+    """ returns the current time in TDB """
     # determine UTC time in ISO 8601 format
     # outputs: 2019-12-14T00:35:35.119520+00:00
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -44,5 +38,56 @@ def current_time():
 
     # convert SPICE time to seconds past J2000
     et = spice.str2et(spice_time)
+    return et
 
-    return jsonify({'time': spice_time, 'et': et})
+
+@app.route('/')
+def get_root():
+    return str(app.url_map) + '\n'
+
+
+@app.route('/planets')
+def get_planets():
+    return jsonify({
+        'naif_ids': naif_ids,
+        'naif_names': naif_names,
+        'spk': spk_file
+    })
+
+
+@app.route('/state/<int:naif_id>', defaults={'et': 'now'})
+@app.route('/state/<int:naif_id>/<int:et>')
+@app.route('/state/<int:naif_id>/<float:et>')
+def get_state(naif_id, et):
+    try:
+        if et == 'now':
+            et = current_et()
+        spice_time = spice.timout(et, pictur)
+        targ = spice.bodc2n(naif_id)
+        ref = 'J2000'
+        abcorr = 'NONE'
+        obs = 'SOLAR SYSTEM BARYCENTER'
+        state, lt = spice.spkezr(targ, et, ref, abcorr, obs)
+    except spice.utils.support_types.SpiceyError as e:
+        flask.abort(400, str(e))
+
+    return jsonify({
+        'naif_id': naif_id,
+        'targ': targ,
+        'et': et,
+        'time': spice_time,
+        'ref': ref,
+        'abcorr': abcorr,
+        'obs': obs,
+        'state': list(state),
+        'lt': lt
+    })
+
+
+@app.route('/now')
+def get_now():
+    """ returns the current time in UTC and J2000 systems """
+    et = current_et()
+    spice_time = spice.timout(et, pictur)
+
+    return jsonify({'time': spice_time, 'pictur': pictur, 'et': et})
