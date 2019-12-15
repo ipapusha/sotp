@@ -103,7 +103,7 @@ def get_planets():
 def get_state(naif_id, et):
     try:
         state = target_state(naif_id, et=et)
-    except spice.utils.support_types.SpiceyError as e:
+    except SpiceyError as e:
         flask.abort(400, str(e))
 
     return jsonify(state)
