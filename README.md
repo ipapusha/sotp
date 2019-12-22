@@ -1,7 +1,7 @@
 # SOTP: State of the Planets
-Accesses key planetary parameters from the DE430 ephemeris, such as their
-current position and velocity (in the J2000 frame), as well as visualizes the
-state of the solar system in a to-scale pictoral form.
+Exposes key parameters from the DE430 ephemeris as a REST API, such as the
+current position and velocity of the planets (in the J2000 frame), and draws a
+picture of the solar system to scale.
 
 # Installation
 ```bash
