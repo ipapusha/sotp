@@ -135,28 +135,31 @@ def get_now():
 # Figure-creating routes
 # ======================
 
-
-@app.route('/inner_planets.png')
-def inner_planets_png():
-    # TODO: add ephemeris time
-    fig = planets_fig(draw_inner=True)
+@app.route('/inner_planets.png', defaults={'et': None})
+@app.route('/inner_planets.png/<int:et>')
+@app.route('/inner_planets.png/<float:et>')
+def inner_planets_png(et):
+    fig = planets_fig(draw_inner=True, et=et)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
 
-@app.route('/outer_planets.png')
-def outer_planets_png():
+@app.route('/outer_planets.png', defaults={'et': None})
+@app.route('/outer_planets.png/<int:et>')
+@app.route('/outer_planets.png/<float:et>')
+def outer_planets_png(et):
     # TODO: add ephemeris time
-    fig = planets_fig(draw_inner=False)
+    fig = planets_fig(draw_inner=False, et=et)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
 
-def planets_fig(draw_inner=True):
+def planets_fig(draw_inner=True, et=None):
     # plot position
-    et = current_et()
+    if et is None:
+        et = current_et()
     ets = np.linspace(et, et + 365.25 * 12.0 / 12.0 * spice.spd(), 365)
     naif_ids_inner = [10, 199, 299, 399, 4]
     naif_ids_outer = [10, 199, 299, 399, 4, 5, 6, 7, 8, 9]

@@ -1,3 +1,5 @@
+RUNFLAGS="--host=0.0.0.0"
+
 default: run
 
 check-virtual-env:
@@ -12,7 +14,7 @@ init: check-virtual-env
 .PHONY: run
 run: check-virtual-env
 run: sotp.py
-	FLASK_APP=$< FLASK_DEBUG=1 flask run
+	FLASK_APP=$< FLASK_DEBUG=1 flask run $(RUNFLAGS)
 
 .PHONY: notebook
 notebook: check-virtual-env
