@@ -15,16 +15,18 @@ $ source venv/bin/activate
 ```
 
 # Endpoints
-Endpoint                | Method              | Function
-------------------------|---------------------|-------------------
-`/`                     |(GET, HEAD, OPTIONS) | get_root
-`/now`                  |(GET, HEAD, OPTIONS) | get_now
-`/planets`              |(GET, HEAD, OPTIONS) | get_planets
-`/inner_planets.png`    |(GET, HEAD, OPTIONS) | inner_planets_png
-`/outer_planets.png`    |(GET, HEAD, OPTIONS) | outer_planets_png
-`/state/<naif_id>/<et>` |(GET, HEAD, OPTIONS) | get_state
-`/state/<naif_id>/<et>` |(GET, HEAD, OPTIONS) | get_state
-`/state/<naif_id>`      |(GET, HEAD, OPTIONS) | get_state
+Endpoint                   | Method              | Function
+---------------------------|---------------------|-------------------
+`/`                        |(GET, HEAD, OPTIONS) | get_root
+`/now`                     |(GET, HEAD, OPTIONS) | get_now
+`/planets`                 |(GET, HEAD, OPTIONS) | get_planets
+`/inner_planets.png`       |(GET, HEAD, OPTIONS) | inner_planets_png
+`/inner_planets.png/<et>`  |(GET, HEAD, OPTIONS) | inner_planets_png
+`/outer_planets.png`       |(GET, HEAD, OPTIONS) | outer_planets_png
+`/outer_planets.png/<et>`  |(GET, HEAD, OPTIONS) | inner_planets_png
+`/state/<naif_id>/<et>`    |(GET, HEAD, OPTIONS) | get_state
+`/state/<naif_id>/<et>`    |(GET, HEAD, OPTIONS) | get_state
+`/state/<naif_id>`         |(GET, HEAD, OPTIONS) | get_state
 
 
 # Examples
